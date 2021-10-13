@@ -1,4 +1,5 @@
 import mysql.connector
+import hashlib
 
 class Database:
     def __init__(self):
@@ -12,25 +13,27 @@ class Database:
         except:
             print('Cannot connect!')
 
-    def add_user(self, correo, contraseña):
-        try:
-            
-            query = "INSERT INTO usuario(correo,contraseña) " \
-                "VALUES (%s,%s)"
-                
-            self.cursor.execute(query, (correo,contraseña))
+    def crear_usuario(self, correo, contraseña):
+        if self.existe_usuario(correo):
+            return False
+        else:
+            h = hashlib.new('sha256', bytes(contraseña, 'utf-8'))
+            h = h.hexdigest()
+            query = "INSERT INTO usuario(correo, contraseña) VALUES (%s, %s)"
+            self.cursor.execute(query, (correo, h))
             self.connection.commit()
 
-            return self.cursor.rowcount > 0
-        except:
-            return False
+            return True
 
-    def get_users(self):
+    def existe_usuario(self, correo):
+        query = "SELECT COUNT(*) FROM usuario WHERE correo = %s"
+        self.cursor.execute(query, (correo,))
 
+        return self.cursor.fetchone()[0] == 1
+
+    def get_usuarios(self):
         query = 'SELECT * FROM usuario'
-
         self.cursor.execute(query)
-
         users = []
         for row in self.cursor.fetchall():
             user = {
@@ -39,7 +42,6 @@ class Database:
                 'contraseña': row[2]
             }
             users.append(user)
-
         return users
 
     def __del__(self):

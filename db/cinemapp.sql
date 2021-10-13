@@ -1,3 +1,4 @@
+-- Modelo
 CREATE DATABASE cinemapp;
 USE cinemapp;
 
@@ -43,6 +44,7 @@ CREATE TABLE comentario(
     FOREIGN KEY (usuarioId) REFERENCES usuario(id)
 );
 
+-- Registros para mostrar
 INSERT INTO usuario(correo, contraseña) VALUES 
 ('ivan@cinemapp.com', '2001SpaceOdyssey'),
 ('diana@cinemapp.com', 'EternalSunshine'),
@@ -50,8 +52,10 @@ INSERT INTO usuario(correo, contraseña) VALUES
 ('emmanuel@cinemapp.com', 'Interestellar'),
 ('andres@cinemapp.com', 'Inception1917');
 
+-- Para crear el usuario que se conectará 
 CREATE USER 'cinemapp_admin'@'localhost' IDENTIFIED BY 'Inception2001';
 
 GRANT ALL PRIVILEGES ON cinemapp.* TO 'cinemapp_admin'@'localhost';
 
+-- Consulta utilizada
 SELECT * FROM usuario;

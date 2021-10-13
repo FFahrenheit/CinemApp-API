@@ -1,25 +1,26 @@
-from flask import Flask, jsonify
+from flask import Flask, json, jsonify, request
 from db.connection import Database
 
 def run_server():
     app = Flask(__name__)
     bd = Database()
 
-    @app.route('/')
-    def hola():
-        return '<b>Hola mundo!<b>'
+    @app.route('/api/v1/usuarios', methods=['POST'])
+    def usuario():
+        if request.method == 'POST' and request.is_json:
+            try:
+                data = request.get_json()
+                print(data)
 
-    @app.route('/usuarios/<string:nombre>')
-    def usuarios(nombre):
-        return 'Hola %s' % nombre    
+                if bd.crear_usuario(data['correo'], data['contraseña']):
+                    return jsonify({'code': 'ok'})
+                else:
+                    return jsonify({'code': 'existe'})
+            except:
+                return jsonify({'code': 'error'})
 
-    @app.route('/api/v1/usuarios')
-    def get_usuarios():
-        usuarios  = bd.get_users()
 
-        return jsonify(usuarios)
-
-    app.run()
+    app.run(debug=True)
 
 if __name__ == '__main__':
     run_server()
