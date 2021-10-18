@@ -19,6 +19,22 @@ def run_server():
             except:
                 return jsonify({'code': 'error'})
 
+    @app.route('/api/v1/sesiones', methods=['POST'])
+    def sesion():
+        if request.method == 'POST' and request.is_json:
+            try:
+                data = request.get_json()
+                correo = data['correo']
+                contra = data['contraseña']
+
+                id, ok = bd.iniciar_sesion(correo, contra)
+
+                if ok:
+                    return jsonify({'code': 'ok', 'id': id})
+                else:
+                    return jsonify({'code': 'noexiste'})
+            except:
+                return jsonify({'code': 'error'})
 
     app.run(debug=True)
 

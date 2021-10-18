@@ -44,5 +44,19 @@ class Database:
             users.append(user)
         return users
 
+    def iniciar_sesion(self, correo, contraseña):
+        h = hashlib.new('sha256', bytes(contraseña, 'utf-8'))
+        h = h.hexdigest()
+        
+        query = 'SELECT id FROM usuario WHERE correo = %s AND contraseña = %s'
+        self.cursor.execute(query, (correo, h))
+        
+        id = self.cursor.fetchone()
+
+        if id:
+            return id[0], True
+        else:
+            return None, False
+
     def __del__(self):
         self.connection.close()
