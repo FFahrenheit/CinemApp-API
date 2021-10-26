@@ -5,7 +5,7 @@ def run_server():
     app = Flask(__name__)
     bd = Database()
 
-    @app.route('/api/v1/usuarios', methods=['POST'])
+    @app.route('/api/v1/usuarios', methods=['POST']) 
     def usuario():
         if request.method == 'POST' and request.is_json:
             try:
@@ -19,6 +19,27 @@ def run_server():
             except:
                 return jsonify({'code': 'error'})
 
+    @app.route('/api/v1/peliculas', methods=['GET', 'POST'])
+    @app.route('/api/v1/peliculas/<int:id>', methods=['GET'])
+    def peliculas(id = None):
+        if request.method == 'POST' and request.is_json:
+            try:
+                data = request.get_json()
+                print(data)
+
+                if bd.insertar_pelicula(data):
+                    return jsonify({ 'code': 'ok' })
+                else:
+                    return jsonify({'code': 'no'})
+            except Exception as e:
+                print(e)
+                return jsonify({'code': 'error'})
+
+        elif request.method == 'GET' and id is None:
+            return jsonify(bd.get_peliculas())
+        elif request.method == 'GET' and id is not None:
+            return jsonify(bd.get_pelicula(id))
+ 
     @app.route('/api/v1/sesiones', methods=['POST'])
     def sesion():
         if request.method == 'POST' and request.is_json:
