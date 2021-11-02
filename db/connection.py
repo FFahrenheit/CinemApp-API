@@ -107,8 +107,8 @@ class Database:
             pelicula = {
                 'id': row[0],
                 'titulo': row[1],
-                'imagen': row[2],
-                'fecha_visto': row[3],
+                'fecha_visto': row[2],
+                'imagen': row[3],
                 'director': row[4],
                 'año': row[5],
                 'valoracion': row[6],
@@ -118,6 +118,42 @@ class Database:
             }
         
         return pelicula
+
+    def modificar_pelicula(self, id, columna, valor):
+        update = f"UPDATE pelicula SET { columna } = %s WHERE id = %s"
+        self.cursor.execute(update, (valor, id))
+        self.connection.commit()
+
+        return self.cursor.rowcount
+
+    def eliminar_pelicula(self, id):
+        delete = "DELETE FROM pelicula WHERE id = %s"
+        self.cursor.execute(delete, (id,))
+        self.connection.commit()
+
+        return self.cursor.rowcount
+
+    def get_peliculas_usuario(self, id):
+        query = "SELECT * FROM pelicula WHERE usuarioId = %s"
+        self.cursor.execute(query, (id,))
+
+        peliculas = []
+        for row in self.cursor.fetchall():
+            pelicula = {
+                'id': row[0],
+                'titulo': row[1],
+                'fecha_visto': row[2],
+                'imagen': row[3],
+                'director': row[4],
+                'año': row[5],
+                'valoracion': row[6],
+                'favorito': row[7],
+                'reseña': row[8],
+                'compartido': row[9]
+            }
+            peliculas.append(pelicula)
+
+        return peliculas
 
 
     def __del__(self):

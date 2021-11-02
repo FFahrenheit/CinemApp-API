@@ -5,8 +5,9 @@ def run_server():
     app = Flask(__name__)
     bd = Database()
 
-    @app.route('/api/v1/usuarios', methods=['POST']) 
-    def usuario():
+    @app.route('/api/v1/usuarios', methods=['POST'])
+    @app.route('/api/v1/usuarios/<int:id>/peliculas', methods = ['GET'])
+    def usuario(id = None):
         if request.method == 'POST' and request.is_json:
             try:
                 data = request.get_json()
@@ -18,9 +19,11 @@ def run_server():
                     return jsonify({'code': 'existe'})
             except:
                 return jsonify({'code': 'error'})
+        elif request.method == 'GET' and id is not None:
+            return jsonify(bd.get_peliculas_usuario(id))
 
     @app.route('/api/v1/peliculas', methods=['GET', 'POST'])
-    @app.route('/api/v1/peliculas/<int:id>', methods=['GET'])
+    @app.route('/api/v1/peliculas/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
     def peliculas(id = None):
         if request.method == 'POST' and request.is_json:
             try:
@@ -39,6 +42,20 @@ def run_server():
             return jsonify(bd.get_peliculas())
         elif request.method == 'GET' and id is not None:
             return jsonify(bd.get_pelicula(id))
+        elif request.method == 'PATCH' and id is not None and request.is_json:
+            data = request.get_json()
+            column = data['columna']
+            value = data['valor']
+
+            if bd.modificar_pelicula(id, column, value):
+                return jsonify(code='ok')
+            else:
+                 return jsonify(code='error')
+        elif request.method == 'DELETE' and id is not None:
+            if bd.eliminar_pelicula(id):
+                return jsonify(code='ok')
+            else:
+                return jsonify(code='error')
  
     @app.route('/api/v1/sesiones', methods=['POST'])
     def sesion():
